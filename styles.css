@@ -229,6 +229,60 @@ body {
 .add-to-cart-btn:hover {
     background: var(--color-btn-hover);
 }
+.empty-state {
+    grid-column: 1 / -1;
+    background: #fff;
+    color: #555;
+    border: 1px dashed #d0d0d0;
+    border-radius: 1rem;
+    padding: 2rem;
+    text-align: center;
+    font-size: 1.05rem;
+}
+
+.cart-section {
+    max-width: 900px;
+    margin: 0 auto 3rem auto;
+    padding: 2rem 1.5rem;
+    background: #fff;
+    border: 1px solid var(--color-card-border);
+    border-radius: 1.2rem;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+}
+.cart-section h2 {
+    margin-bottom: 1.25rem;
+    font-size: 1.8rem;
+    text-align: center;
+    color: #23272f;
+}
+.cart-items {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+.cart-item {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.8rem 1rem;
+    border-radius: 0.8rem;
+    background: #f6f6f7;
+}
+.cart-empty {
+    padding: 0.75rem 0.5rem;
+    color: #666;
+    text-align: center;
+}
+.cart-total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.2rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--color-card-border);
+}
 
 /* Footer */
 .footer {

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>T     harun's Store</title>
+    <title>Tharun's Store</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -18,7 +18,7 @@
             </nav>
             <div class="nav-actions">
                 <form class="search-bar" onsubmit="return false;">
-                    <input type="text" placeholder="Search products..." aria-label="Search">
+                    <input id="search-input" type="text" placeholder="Search products..." aria-label="Search">
                     <button type="submit" aria-label="Search">
                         <span class="search-icon">🔍</span>
                     </button>
@@ -46,6 +46,15 @@
             <h2>Featured Products</h2>
             <div class="product-grid" id="product-grid">
                 <!-- Product cards will be injected here by JS -->
+            </div>
+        </section>
+
+        <section class="cart-section" id="cart">
+            <h2>Your Cart</h2>
+            <ul class="cart-items" id="cart-items"></ul>
+            <div class="cart-total-row">
+                <span>Total</span>
+                <strong id="cart-total">$0.00</strong>
             </div>
         </section>
     </main>

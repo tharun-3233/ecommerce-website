@@ -1,41 +1,56 @@
 // script.js - Cart functionality and interactivity
 
-// Sample product data (IDs, names, prices, image paths)
 const products = [
     {
         id: 1,
-        name: "Wireless Headphones",
+        name: 'Wireless Headphones',
         price: 59.99,
-        image: "https://via.placeholder.com/120?text=Headphones"
+        image: 'https://via.placeholder.com/120?text=Headphones'
     },
     {
         id: 2,
-        name: "Smart Watch",
+        name: 'Smart Watch',
         price: 89.99,
-        image: "https://via.placeholder.com/120?text=Watch"
+        image: 'https://via.placeholder.com/120?text=Watch'
     },
     {
         id: 3,
-        name: "Bluetooth Speaker",
+        name: 'Bluetooth Speaker',
         price: 39.99,
-        image: "https://via.placeholder.com/120?text=Speaker"
+        image: 'https://via.placeholder.com/120?text=Speaker'
     },
     {
         id: 4,
-        name: "Fitness Tracker",
+        name: 'Fitness Tracker',
         price: 29.99,
-        image: "https://via.placeholder.com/120?text=Tracker"
+        image: 'https://via.placeholder.com/120?text=Tracker'
     }
 ];
 
-// Global cart array
 let cart = [];
 
-// Render product cards dynamically
-function renderProducts() {
+function renderProducts(filterText = '') {
     const grid = document.getElementById('product-grid');
+    if (!grid) {
+        return;
+    }
+
+    const normalized = filterText.trim().toLowerCase();
+    const filteredProducts = normalized
+        ? products.filter(product => product.name.toLowerCase().includes(normalized))
+        : products;
+
     grid.innerHTML = '';
-    products.forEach(product => {
+
+    if (!filteredProducts.length) {
+        const emptyState = document.createElement('div');
+        emptyState.className = 'empty-state';
+        emptyState.textContent = 'No products match your search.';
+        grid.appendChild(emptyState);
+        return;
+    }
+
+    filteredProducts.forEach(product => {
         const card = document.createElement('div');
         card.className = 'product-card';
         card.innerHTML = `
@@ -50,15 +65,49 @@ function renderProducts() {
     });
 }
 
-// Update cart badge count
-function updateCartBadge() {
-    const badge = document.getElementById('cart-badge');
-    badge.textContent = cart.length;
+function getCartTotalQuantity() {
+    return cart.reduce((total, item) => total + item.quantity, 0);
 }
 
-// Show notification modal
+function updateCartBadge() {
+    const badge = document.getElementById('cart-badge');
+    if (badge) {
+        badge.textContent = getCartTotalQuantity();
+    }
+}
+
+function renderCart() {
+    const cartItems = document.getElementById('cart-items');
+    const cartTotal = document.getElementById('cart-total');
+
+    if (!cartItems || !cartTotal) {
+        return;
+    }
+
+    if (!cart.length) {
+        cartItems.innerHTML = '<li class="cart-empty">Your cart is empty.</li>';
+        cartTotal.textContent = '$0.00';
+        return;
+    }
+
+    const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    cartItems.innerHTML = cart
+        .map(item => `
+            <li class="cart-item">
+                <span>${item.name} x ${item.quantity}</span>
+                <span>$${(item.price * item.quantity).toFixed(2)}</span>
+            </li>
+        `)
+        .join('');
+    cartTotal.textContent = `$${total.toFixed(2)}`;
+}
+
 function showNotification(message) {
     const notif = document.getElementById('notification');
+    if (!notif) {
+        return;
+    }
+
     notif.textContent = message;
     notif.classList.add('show');
     setTimeout(() => {
@@ -66,24 +115,59 @@ function showNotification(message) {
     }, 1800);
 }
 
-// Add to cart handler
-function handleAddToCart(e) {
-    if (e.target.classList.contains('add-to-cart-btn')) {
-        const id = Number(e.target.getAttribute('data-id'));
-        const product = products.find(p => p.id === id);
-        if (product) {
-            cart.push(product);
-            updateCartBadge();
-            showNotification(`${product.name} added to cart!`);
-            console.log('Cart:', cart);
-        }
+function handleAddToCart(event) {
+    const button = event.target.closest('.add-to-cart-btn');
+    if (!button) {
+        return;
     }
+
+    const id = Number(button.getAttribute('data-id'));
+    const product = products.find(item => item.id === id);
+    if (!product) {
+        return;
+    }
+
+    const existingItem = cart.find(item => item.id === id);
+    if (existingItem) {
+        existingItem.quantity += 1;
+    } else {
+        cart.push({ ...product, quantity: 1 });
+    }
+
+    updateCartBadge();
+    renderCart();
+    showNotification(`${product.name} added to cart!`);
 }
 
-// Attach event listeners after DOM loads
+function handleSearch(event) {
+    const searchInput = document.getElementById('search-input');
+    if (!searchInput) {
+        return;
+    }
+
+    const value = searchInput.value;
+    renderProducts(value);
+}
+
 window.addEventListener('DOMContentLoaded', () => {
     renderProducts();
+    renderCart();
     updateCartBadge();
-    // Delegate add-to-cart clicks
-    document.getElementById('product-grid').addEventListener('click', handleAddToCart);
+
+    const productGrid = document.getElementById('product-grid');
+    if (productGrid) {
+        productGrid.addEventListener('click', handleAddToCart);
+    }
+
+    const searchInput = document.getElementById('search-input');
+    if (searchInput) {
+        searchInput.addEventListener('input', handleSearch);
+    }
+
+    const cartIcon = document.getElementById('cart-icon');
+    if (cartIcon) {
+        cartIcon.addEventListener('click', () => {
+            document.getElementById('cart')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+    }
 });
