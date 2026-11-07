@@ -953,6 +953,17 @@ p {
     font-size: 15px;
 }
 
+.whatsapp-order-link {
+    color: var(--green);
+    font-size: 12px;
+    font-weight: 600;
+    text-align: center;
+}
+
+.whatsapp-order-link[hidden] {
+    display: none;
+}
+
 .empty-state {
     grid-column: 1 / -1;
     padding: 62px 20px;

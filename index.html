@@ -4,7 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#f7f8f5" id="theme-color">
-    <meta name="description" content="Paapu Masala brings the warmth of Kongu tradition to your kitchen.">
+    <meta name="description" content="Discover Paapu Masala, bringing the bold, comforting flavours of Kongu tradition to your kitchen.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://tharun-3233.github.io/ecommerce-website/">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Paapu Masala">
+    <meta property="og:title" content="Paapu Masala — Rooted from Kongu tradition">
+    <meta property="og:description" content="Discover Paapu Masala, bringing the bold, comforting flavours of Kongu tradition to your kitchen.">
+    <meta property="og:url" content="https://tharun-3233.github.io/ecommerce-website/">
     <title>Paapu Masala — Rooted from Kongu tradition</title>
     <link rel="stylesheet" href="styles.css">
     <script>
@@ -161,7 +168,7 @@
                     <p class="shipping-note" id="shipping-note">Delivery details will be confirmed after you place your order.</p>
                     <div class="summary-total"><span>Total</span><strong id="cart-total">₹0.00</strong></div>
                     <button class="primary-button checkout-button" id="checkout-button" type="button">Place your order <span aria-hidden="true">→</span></button>
-                    <p class="secure-note">Your order request is saved in this browser.</p>
+                    <p class="secure-note">Checkout opens WhatsApp. Review and send your message to place an order.</p>
                 </aside>
             </div>
         </section>
@@ -187,7 +194,7 @@
             </div>
             <button class="dialog-close" id="close-order-dialog" type="button" aria-label="Close order form">×</button>
         </div>
-        <p class="dialog-intro">This demo saves your order request in this browser only. It does not send your details to Paapu Masala.</p>
+        <p class="dialog-intro">Confirming opens WhatsApp with your order details. Review the message and tap Send to place the order. Delivery fees are confirmed by Paapu Masala.</p>
         <form id="order-form">
             <label>Full name
                 <input name="customerName" type="text" autocomplete="name" maxlength="100" required>
@@ -200,6 +207,7 @@
             </label>
             <p class="order-total">Order total <strong id="dialog-order-total">₹0.00</strong></p>
             <button class="primary-button" type="submit">Confirm order <span aria-hidden="true">→</span></button>
+            <a class="whatsapp-order-link" id="whatsapp-order-link" href="#" target="_blank" rel="noopener noreferrer" hidden>Open WhatsApp to send your order</a>
         </form>
     </dialog>
 

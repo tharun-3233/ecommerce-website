@@ -1,7 +1,7 @@
 const PRODUCT_STORAGE_KEY = 'paapu-masala-products-v1';
 const CART_STORAGE_KEY = 'paapu-masala-cart-v1';
 const THEME_STORAGE_KEY = 'paapu-masala-theme';
-const ORDERS_STORAGE_KEY = 'paapu-masala-orders-v1';
+const WHATSAPP_ORDER_NUMBER = '919750433233';
 let products = loadProducts();
 let searchQuery = '';
 let notificationTimeout;
@@ -391,18 +391,6 @@ function updateCart(productId, action) {
     renderCart();
 }
 
-function resetFilters() {
-    searchQuery = '';
-    activeCategory = 'all';
-    document.getElementById('search-input').value = '';
-    document.querySelectorAll('.filter-chip').forEach(button => {
-        const isSelected = button.dataset.category === 'all';
-        button.classList.toggle('active', isSelected);
-        button.setAttribute('aria-pressed', String(isSelected));
-    });
-    renderProducts();
-}
-
 function handleSearch(event) {
     event.preventDefault();
     searchQuery = document.getElementById('search-input').value.trim();
@@ -476,23 +464,6 @@ function removeProduct(productId) {
     showNotification(`${product.name} removed from the catalogue.`);
 }
 
-function saveOrder(order) {
-    try {
-        const savedOrders = localStorage.getItem(ORDERS_STORAGE_KEY);
-        const orders = savedOrders ? JSON.parse(savedOrders) : [];
-        if (!Array.isArray(orders)) {
-            throw new Error('Saved order data is not a list.');
-        }
-        orders.push(order);
-        localStorage.setItem(ORDERS_STORAGE_KEY, JSON.stringify(orders));
-        return true;
-    } catch (error) {
-        console.error('Unable to save the order in this browser.', error);
-        showNotification('Your browser could not save the order. Please try again.');
-        return false;
-    }
-}
-
 function placeOrder(event) {
     event.preventDefault();
     if (!cart.length) {
@@ -500,36 +471,29 @@ function placeOrder(event) {
     }
 
     const values = new FormData(event.currentTarget);
-    const order = {
-        orderNumber: `PM-${Date.now()}`,
-        createdAt: new Date().toISOString(),
-        customer: {
-            name: values.get('customerName').trim(),
-            phone: values.get('phone').trim(),
-            address: values.get('address').trim()
-        },
-        items: cart.map(item => {
-            const product = products.find(candidate => candidate.id === item.id);
-            return {
-                productId: item.id,
-                name: product.name,
-                quantity: item.quantity,
-                unitPrice: product.price
-            };
-        }),
-        total: getCartSubtotal()
-    };
-
-    if (!saveOrder(order)) {
-        return;
-    }
-
-    cart = [];
-    saveCart();
-    renderCart();
-    event.currentTarget.reset();
-    document.getElementById('order-dialog').close();
-    showNotification(`Order ${order.orderNumber} saved in this browser. Contact Paapu Masala to arrange delivery.`);
+    const items = cart.map(item => {
+        const product = products.find(candidate => candidate.id === item.id);
+        return `- ${product.name} x ${item.quantity}: ${formatPrice(product.price * item.quantity)}`;
+    });
+    const message = [
+        'Hello Paapu Masala! I would like to place an order:',
+        '',
+        `Name: ${values.get('customerName').trim()}`,
+        `Phone: ${values.get('phone').trim()}`,
+        `Delivery address: ${values.get('address').trim()}`,
+        '',
+        'Order:',
+        ...items,
+        '',
+        `Subtotal: ${formatPrice(getCartSubtotal())}`,
+        'Please confirm product availability and delivery charges.'
+    ].join('\n');
+    const whatsappLink = document.getElementById('whatsapp-order-link');
+    whatsappLink.href = `https://wa.me/${WHATSAPP_ORDER_NUMBER}?text=${encodeURIComponent(message)}`;
+    whatsappLink.hidden = false;
+    whatsappLink.focus();
+    whatsappLink.click();
+    showNotification('WhatsApp opened with your order. Tap Send in WhatsApp to submit it.');
 }
 
 document.addEventListener('DOMContentLoaded', () => {
