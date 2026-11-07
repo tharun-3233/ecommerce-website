@@ -175,45 +175,8 @@ CREATE INDEX idx_payments_order_id ON payments(order_id);
 CREATE INDEX idx_reviews_product_id ON reviews(product_id);
 
 INSERT INTO categories (category_name, description) VALUES
-    ('Electronics', 'Devices and digital products'),
-    ('Wearables', 'Smart wearable accessories'),
-    ('Audio', 'Sound and listening devices'),
-    ('Fitness', 'Wellness and motion tracking gear');
-
-INSERT INTO products (category_id, product_name, slug, short_description, long_description, price, compare_at_price, is_active, is_featured) VALUES
-    (3, 'Wireless Headphones', 'wireless-headphones', 'Big, beautiful sound. All-day comfort.', 'Enjoy immersive sound and a long battery life with these lightweight wireless headphones.', 59.99, 79.99, TRUE, TRUE),
-    (2, 'Everyday Smartwatch', 'everyday-smartwatch', 'A little more in tune with your day.', 'A sleek smart watch with health monitoring, notifications, and GPS.', 89.99, 119.99, TRUE, TRUE),
-    (3, 'Pocket Bluetooth Speaker', 'pocket-bluetooth-speaker', 'Good tunes go wherever you do.', 'Compact wireless speaker with excellent durability and room-filling sound.', 39.99, NULL, TRUE, FALSE),
-    (4, 'Daily Fitness Tracker', 'daily-fitness-tracker', 'Gentle nudges for feeling your best.', 'A lightweight wearable that helps you stay on top of your daily health goals.', 29.99, 39.99, TRUE, TRUE),
-    (3, 'Studio Wireless Earbuds', 'studio-wireless-earbuds', 'Your own little pocket of quiet.', 'Wireless earbuds designed for comfortable listening wherever you go.', 49.99, 64.99, TRUE, TRUE),
-    (2, 'Minimal Watch', 'minimal-watch', 'A timeless little something for your wrist.', 'A versatile everyday watch with a simple, timeless design.', 74.99, NULL, TRUE, FALSE),
-    (4, 'Move More Smart Band', 'move-more-smart-band', 'Small steps, a little more often.', 'A lightweight smart band for everyday activity and wellness tracking.', 34.99, NULL, TRUE, FALSE),
-    (3, 'Soundwave Mini Speaker', 'soundwave-mini-speaker', 'Room-filling sound in a lovely little package.', 'A compact wireless speaker designed to bring music to any room.', 44.99, 54.99, TRUE, FALSE);
-
-INSERT INTO product_images (product_id, image_url, alt_text, is_primary) VALUES
-    (1, 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=800&q=85', 'Wireless headphones', TRUE),
-    (2, 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=800&q=85', 'Everyday smartwatch', TRUE),
-    (3, 'https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?auto=format&fit=crop&w=800&q=85', 'Pocket Bluetooth speaker', TRUE),
-    (4, 'https://images.unsplash.com/photo-1575311373937-040b8e1fd5b6?auto=format&fit=crop&w=800&q=85', 'Daily fitness tracker', TRUE),
-    (5, 'https://images.unsplash.com/photo-1606220945770-b5b6c2c55bf1?auto=format&fit=crop&w=800&q=85', 'Studio wireless earbuds', TRUE),
-    (6, 'https://images.unsplash.com/photo-1524805444758-089113d48a6d?auto=format&fit=crop&w=800&q=85', 'Minimal watch', TRUE),
-    (7, 'https://images.unsplash.com/photo-1508685096489-7aacd43bd3b1?auto=format&fit=crop&w=800&q=85', 'Move More smart band', TRUE),
-    (8, 'https://images.unsplash.com/photo-1589003077984-894e133dabab?auto=format&fit=crop&w=800&q=85', 'Soundwave mini speaker', TRUE);
-
-INSERT INTO warehouses (warehouse_name, city, state, country, is_active) VALUES
-    ('Central Fulfillment Hub', 'Chicago', 'Illinois', 'USA', TRUE),
-    ('West Distribution Center', 'Los Angeles', 'California', 'USA', TRUE);
-
-INSERT INTO inventory (product_id, warehouse_id, stock_quantity, reserved_quantity, reorder_level) VALUES
-    (1, 1, 75, 10, 20),
-    (2, 1, 40, 5, 15),
-    (3, 2, 60, 8, 18),
-    (4, 1, 90, 12, 25),
-    (5, 2, 55, 6, 15),
-    (6, 1, 35, 2, 12),
-    (7, 1, 70, 8, 20),
-    (8, 2, 45, 4, 12),
-    (2, 2, 30, 3, 10),
-    (1, 2, 50, 5, 15);
+    ('Masala blends', 'Blended spices inspired by Kongu cooking'),
+    ('Spice powders', 'Ground spices for everyday cooking'),
+    ('Whole spices', 'Whole spices for traditional recipes');
 
 COMMIT;

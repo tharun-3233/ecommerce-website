@@ -1,8 +1,8 @@
-# ShopEase
+# Paapu Masala
 
-A responsive storefront demo with product photography, search, category filters, sorting, and a shopping bag that stays saved in the current browser.
+A responsive Paapu Masala storefront rooted in Kongu tradition. The product catalogue starts empty; add products with a price, rating, review, description, and optional photo URL using the form on the shop page.
 
-Use the theme button in the header to switch between light and dark mode. Your choice is saved in this browser.
+Product details, the shopping bag, and order requests are saved in the current browser. Orders are not sent to a business or payment provider; the site needs a server and order-processing integration to receive orders across devices. Use the theme button in the header to switch between light and dark mode.
 
 ## Run the storefront
 
@@ -19,13 +19,13 @@ The site has no build step or npm dependencies.
 
 You can also open `index.html` directly, but a local server is recommended. Product photography and web fonts are served from the internet, so those need a connection.
 
-## Set up the PostgreSQL schema
+## Optional PostgreSQL schema
 
-The SQL file creates the storefront tables and inserts matching sample products, product photos, warehouses, and inventory. Use it with a new, empty PostgreSQL database:
+The SQL file creates starter storefront tables and spice categories. It does not populate the product catalogue or connect to the static website. Use it with a new, empty PostgreSQL database:
 
 ```powershell
-createdb shopease
-psql -d shopease -f sql.sql
+createdb paapu_masala
+psql -d paapu_masala -f sql.sql
 ```
 
-The database schema is a separate starter resource; the static storefront does not connect to PostgreSQL yet. The displayed catalog is in `script.js`, and the shopping bag is saved in browser `localStorage`. There is no account service, server API, live inventory sync, or real payment processing in this demo. The checkout button explains this rather than collecting payment details.
+The PostgreSQL schema is a separate starter resource. The static storefront has no account service, server API, shared inventory, or real payment processing.

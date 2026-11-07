@@ -1,110 +1,52 @@
-const products = [
-    {
-        id: 1,
-        name: 'Wireless Headphones',
-        category: 'Audio',
-        description: 'Big, beautiful sound. All-day comfort.',
-        price: 59.99,
-        compareAt: 79.99,
-        rating: 4.9,
-        reviews: 128,
-        badge: 'BESTSELLER',
-        image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=800&q=85'
-    },
-    {
-        id: 2,
-        name: 'Everyday Smartwatch',
-        category: 'Wearables',
-        description: 'A little more in tune with your day.',
-        price: 89.99,
-        compareAt: 119.99,
-        rating: 4.8,
-        reviews: 94,
-        badge: 'CUSTOMER LOVE',
-        image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=800&q=85'
-    },
-    {
-        id: 3,
-        name: 'Pocket Bluetooth Speaker',
-        category: 'Audio',
-        description: 'Good tunes go wherever you do.',
-        price: 39.99,
-        compareAt: null,
-        rating: 4.7,
-        reviews: 76,
-        badge: 'TAKE IT OUTSIDE',
-        image: 'https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?auto=format&fit=crop&w=800&q=85'
-    },
-    {
-        id: 4,
-        name: 'Daily Fitness Tracker',
-        category: 'Fitness',
-        description: 'Gentle nudges for feeling your best.',
-        price: 29.99,
-        compareAt: 39.99,
-        rating: 4.8,
-        reviews: 112,
-        badge: 'A GOOD HABIT',
-        image: 'https://images.unsplash.com/photo-1575311373937-040b8e1fd5b6?auto=format&fit=crop&w=800&q=85'
-    },
-    {
-        id: 5,
-        name: 'Studio Wireless Earbuds',
-        category: 'Audio',
-        description: 'Your own little pocket of quiet.',
-        price: 49.99,
-        compareAt: 64.99,
-        rating: 4.6,
-        reviews: 63,
-        badge: 'ON THE GO',
-        image: 'https://images.unsplash.com/photo-1606220945770-b5b6c2c55bf1?auto=format&fit=crop&w=800&q=85'
-    },
-    {
-        id: 6,
-        name: 'Minimal Watch',
-        category: 'Wearables',
-        description: 'A timeless little something for your wrist.',
-        price: 74.99,
-        compareAt: null,
-        rating: 4.9,
-        reviews: 51,
-        badge: 'JUST RIGHT',
-        image: 'https://images.unsplash.com/photo-1524805444758-089113d48a6d?auto=format&fit=crop&w=800&q=85'
-    },
-    {
-        id: 7,
-        name: 'Move More Smart Band',
-        category: 'Fitness',
-        description: 'Small steps, a little more often.',
-        price: 34.99,
-        compareAt: null,
-        rating: 4.5,
-        reviews: 42,
-        badge: 'FEEL-GOOD FIND',
-        image: 'https://images.unsplash.com/photo-1508685096489-7aacd43bd3b1?auto=format&fit=crop&w=800&q=85'
-    },
-    {
-        id: 8,
-        name: 'Soundwave Mini Speaker',
-        category: 'Audio',
-        description: 'Room-filling sound in a lovely little package.',
-        price: 44.99,
-        compareAt: 54.99,
-        rating: 4.7,
-        reviews: 38,
-        badge: 'SMALL BUT MIGHTY',
-        image: 'https://images.unsplash.com/photo-1589003077984-894e133dabab?auto=format&fit=crop&w=800&q=85'
-    }
-];
-
-const CART_STORAGE_KEY = 'shopease-cart-v1';
-const THEME_STORAGE_KEY = 'shopease-theme';
-const FREE_SHIPPING_THRESHOLD = 75;
-const SHIPPING_FEE = 6;
-let activeCategory = 'all';
+const PRODUCT_STORAGE_KEY = 'paapu-masala-products-v1';
+const CART_STORAGE_KEY = 'paapu-masala-cart-v1';
+const THEME_STORAGE_KEY = 'paapu-masala-theme';
+const ORDERS_STORAGE_KEY = 'paapu-masala-orders-v1';
+let products = loadProducts();
 let searchQuery = '';
-let sortOrder = 'featured';
 let notificationTimeout;
+
+function loadProducts() {
+    try {
+        const savedProducts = localStorage.getItem(PRODUCT_STORAGE_KEY);
+        if (!savedProducts) {
+            return [];
+        }
+
+        const parsedProducts = JSON.parse(savedProducts);
+        if (!Array.isArray(parsedProducts)) {
+            throw new Error('Saved product data is not a list.');
+        }
+
+        return parsedProducts.filter(product =>
+            Number.isInteger(product.id)
+            && typeof product.name === 'string'
+            && typeof product.category === 'string'
+            && typeof product.description === 'string'
+            && Number.isFinite(product.price)
+            && product.price > 0
+            && Number.isFinite(product.rating)
+            && product.rating >= 1
+            && product.rating <= 5
+            && typeof product.review === 'string'
+            && typeof product.image === 'string'
+        );
+    } catch (error) {
+        console.error('Unable to load saved products.', error);
+        return [];
+    }
+}
+
+function saveProducts() {
+    try {
+        localStorage.setItem(PRODUCT_STORAGE_KEY, JSON.stringify(products));
+        return true;
+    } catch (error) {
+        console.error('Unable to save products in this browser.', error);
+        showNotification('Your browser could not save this product.');
+        return false;
+    }
+}
 
 function getStoredTheme() {
     try {
@@ -184,22 +126,21 @@ function getCartSubtotal() {
 }
 
 function formatPrice(price) {
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(price);
+    return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(price);
 }
 
 function getVisibleProducts() {
     const query = searchQuery.trim().toLowerCase();
-    const filtered = products.filter(product => {
-        const matchesCategory = activeCategory === 'all' || product.category === activeCategory;
-        const matchesSearch = !query || `${product.name} ${product.category} ${product.description}`.toLowerCase().includes(query);
-        return matchesCategory && matchesSearch;
-    });
+    const filtered = products.filter(product =>
+        !query || `${product.name} ${product.category} ${product.description} ${product.review}`.toLowerCase().includes(query)
+    );
+    const sortOrder = document.getElementById('sort-select').value;
 
     if (sortOrder === 'price-low') {
         filtered.sort((first, second) => first.price - second.price);
     } else if (sortOrder === 'price-high') {
         filtered.sort((first, second) => second.price - first.price);
-    } else if (sortOrder === 'name') {
+    } else {
         filtered.sort((first, second) => first.name.localeCompare(second.name));
     }
 
@@ -210,24 +151,26 @@ function createProductCard(product) {
     const card = document.createElement('article');
     card.className = 'product-card';
 
-    const imageLink = document.createElement('div');
-    imageLink.className = 'product-image-wrap';
-
-    const image = document.createElement('img');
-    image.className = 'product-image';
-    image.src = product.image;
-    image.alt = product.name;
-    image.loading = 'lazy';
-    image.decoding = 'async';
-    image.addEventListener('error', () => {
-        image.classList.add('image-unavailable');
-        image.alt = `${product.name} image unavailable`;
-    }, { once: true });
-
-    const badge = document.createElement('span');
-    badge.className = 'product-badge';
-    badge.textContent = product.badge;
-    imageLink.append(image, badge);
+    const imageWrap = document.createElement('div');
+    imageWrap.className = 'product-image-wrap';
+    if (product.image) {
+        const image = document.createElement('img');
+        image.className = 'product-image';
+        image.src = product.image;
+        image.alt = product.name;
+        image.loading = 'lazy';
+        image.decoding = 'async';
+        image.addEventListener('error', () => {
+            image.classList.add('image-unavailable');
+            image.alt = `${product.name} image unavailable`;
+        }, { once: true });
+        imageWrap.append(image);
+    } else {
+        const placeholder = document.createElement('span');
+        placeholder.className = 'product-image-placeholder';
+        placeholder.textContent = 'Paapu Masala';
+        imageWrap.append(placeholder);
+    }
 
     const details = document.createElement('div');
     details.className = 'product-details';
@@ -246,7 +189,18 @@ function createProductCard(product) {
 
     const rating = document.createElement('p');
     rating.className = 'product-rating';
-    rating.innerHTML = `<span aria-label="${product.rating} out of 5 stars">★★★★★</span> <span class="rating-count">${product.rating} (${product.reviews})</span>`;
+    const stars = document.createElement('span');
+    const roundedRating = Math.round(product.rating);
+    stars.textContent = `${'★'.repeat(roundedRating)}${'☆'.repeat(5 - roundedRating)}`;
+    stars.setAttribute('aria-label', `${product.rating} out of 5 stars`);
+    const ratingText = document.createElement('span');
+    ratingText.className = 'rating-count';
+    ratingText.textContent = `${product.rating} / 5`;
+    rating.append(stars, ratingText);
+
+    const review = document.createElement('blockquote');
+    review.className = 'product-review';
+    review.textContent = `“${product.review}”`;
 
     const purchaseRow = document.createElement('div');
     purchaseRow.className = 'product-purchase-row';
@@ -271,11 +225,18 @@ function createProductCard(product) {
     addButton.type = 'button';
     addButton.dataset.id = product.id;
     addButton.setAttribute('aria-label', `Add ${product.name} to bag`);
-    addButton.innerHTML = '<span aria-hidden="true">+</span> Add';
+    addButton.textContent = 'Add to bag';
+
+    const removeButton = document.createElement('button');
+    removeButton.className = 'remove-product-btn';
+    removeButton.type = 'button';
+    removeButton.dataset.productId = product.id;
+    removeButton.setAttribute('aria-label', `Remove ${product.name} from the catalogue`);
+    removeButton.textContent = 'Remove product';
 
     purchaseRow.append(priceBlock, addButton);
-    details.append(category, name, description, rating, purchaseRow);
-    card.append(imageLink, details);
+    details.append(category, name, description, rating, review, purchaseRow, removeButton);
+    card.append(imageWrap, details);
     return card;
 }
 
@@ -285,21 +246,39 @@ function renderProducts() {
     const resultsCount = document.getElementById('results-count');
 
     grid.replaceChildren();
-    resultsCount.textContent = `Showing ${visibleProducts.length} ${visibleProducts.length === 1 ? 'find' : 'finds'}`;
+    resultsCount.textContent = searchQuery
+        ? `${visibleProducts.length} ${visibleProducts.length === 1 ? 'product' : 'products'} found`
+        : `${visibleProducts.length} ${visibleProducts.length === 1 ? 'product' : 'products'}`;
 
     if (!visibleProducts.length) {
         const emptyState = document.createElement('div');
         emptyState.className = 'empty-state';
         const title = document.createElement('h3');
-        title.textContent = 'Nothing in the shop just yet.';
+        title.textContent = products.length ? 'No spices match that search.' : 'Your spice collection starts here.';
         const message = document.createElement('p');
-        message.textContent = 'Try a different search or browse everything we have.';
-        const resetButton = document.createElement('button');
-        resetButton.className = 'text-link reset-filters';
-        resetButton.type = 'button';
-        resetButton.textContent = 'See everything';
-        resetButton.addEventListener('click', resetFilters);
-        emptyState.append(title, message, resetButton);
+        message.textContent = products.length
+            ? 'Try another search, or clear the search field to see all products.'
+            : 'There are no products yet. Add your first masala or spice to get started.';
+        emptyState.append(title, message);
+        if (products.length) {
+            const clearSearch = document.createElement('button');
+            clearSearch.className = 'text-link';
+            clearSearch.type = 'button';
+            clearSearch.textContent = 'Clear search';
+            clearSearch.addEventListener('click', () => {
+                document.getElementById('search-input').value = '';
+                searchQuery = '';
+                renderProducts();
+            });
+            emptyState.append(clearSearch);
+        } else {
+            const addFirstProduct = document.createElement('button');
+            addFirstProduct.className = 'text-link';
+            addFirstProduct.type = 'button';
+            addFirstProduct.textContent = 'Add your first product';
+            addFirstProduct.addEventListener('click', openProductForm);
+            emptyState.append(addFirstProduct);
+        }
         grid.append(emptyState);
         return;
     }
@@ -311,18 +290,13 @@ function renderCart() {
     const cartItems = document.getElementById('cart-items');
     const subtotal = getCartSubtotal();
     const itemCount = getCartQuantity();
-    const shipping = itemCount === 0 || subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_FEE;
 
     cartItems.replaceChildren();
     document.getElementById('cart-badge').textContent = itemCount;
     document.getElementById('cart-subtotal').textContent = formatPrice(subtotal);
-    document.getElementById('cart-total').textContent = formatPrice(subtotal + shipping);
-    document.getElementById('shipping-cost').textContent = itemCount === 0
-        ? 'Calculated at checkout'
-        : shipping === 0 ? 'Free' : formatPrice(shipping);
-    document.getElementById('shipping-note').textContent = subtotal >= FREE_SHIPPING_THRESHOLD
-        ? 'Your order ships free. Nice choice!'
-        : `Add ${formatPrice(Math.max(0, FREE_SHIPPING_THRESHOLD - subtotal))} for free shipping.`;
+    document.getElementById('cart-total').textContent = formatPrice(subtotal);
+    document.getElementById('shipping-cost').textContent = itemCount === 0 ? 'Confirmed after order' : 'To be confirmed';
+    document.getElementById('shipping-note').textContent = 'Delivery details will be confirmed after you place your order.';
     document.getElementById('clear-cart').hidden = itemCount === 0;
     document.getElementById('checkout-button').disabled = itemCount === 0;
 
@@ -345,7 +319,7 @@ function renderCart() {
 
         const image = document.createElement('img');
         image.className = 'cart-item-image';
-        image.src = product.image;
+        image.src = product.image || 'assets/paapu-masala-logo.jpg';
         image.alt = '';
 
         const info = document.createElement('div');
@@ -436,6 +410,128 @@ function handleSearch(event) {
     document.getElementById('products').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
+function openProductForm() {
+    const form = document.getElementById('product-form');
+    form.hidden = false;
+    form.querySelector('[name="name"]').focus();
+    form.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function closeProductForm() {
+    const form = document.getElementById('product-form');
+    form.reset();
+    form.hidden = true;
+}
+
+function addProduct(event) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const values = new FormData(form);
+    const product = {
+        id: Math.max(Date.now(), ...products.map(item => item.id + 1)),
+        name: values.get('name').trim(),
+        category: values.get('category').trim(),
+        description: values.get('description').trim(),
+        price: Number(values.get('price')),
+        rating: Number(values.get('rating')),
+        review: values.get('review').trim(),
+        image: values.get('image').trim()
+    };
+
+    if (!product.name || !product.category || !product.description || !product.review
+        || !Number.isFinite(product.price) || product.price <= 0
+        || !Number.isFinite(product.rating) || product.rating < 1 || product.rating > 5) {
+        showNotification('Please complete the product details with a valid price and rating.');
+        return;
+    }
+
+    products.push(product);
+    if (!saveProducts()) {
+        products.pop();
+        return;
+    }
+
+    closeProductForm();
+    renderProducts();
+    showNotification(`${product.name} added to your spice collection.`);
+}
+
+function removeProduct(productId) {
+    const productIndex = products.findIndex(item => item.id === productId);
+    if (productIndex === -1) {
+        return;
+    }
+
+    const [product] = products.splice(productIndex, 1);
+    if (!saveProducts()) {
+        products.splice(productIndex, 0, product);
+        renderProducts();
+        return;
+    }
+
+    cart = cart.filter(item => item.id !== productId);
+    saveCart();
+    renderProducts();
+    renderCart();
+    showNotification(`${product.name} removed from the catalogue.`);
+}
+
+function saveOrder(order) {
+    try {
+        const savedOrders = localStorage.getItem(ORDERS_STORAGE_KEY);
+        const orders = savedOrders ? JSON.parse(savedOrders) : [];
+        if (!Array.isArray(orders)) {
+            throw new Error('Saved order data is not a list.');
+        }
+        orders.push(order);
+        localStorage.setItem(ORDERS_STORAGE_KEY, JSON.stringify(orders));
+        return true;
+    } catch (error) {
+        console.error('Unable to save the order in this browser.', error);
+        showNotification('Your browser could not save the order. Please try again.');
+        return false;
+    }
+}
+
+function placeOrder(event) {
+    event.preventDefault();
+    if (!cart.length) {
+        return;
+    }
+
+    const values = new FormData(event.currentTarget);
+    const order = {
+        orderNumber: `PM-${Date.now()}`,
+        createdAt: new Date().toISOString(),
+        customer: {
+            name: values.get('customerName').trim(),
+            phone: values.get('phone').trim(),
+            address: values.get('address').trim()
+        },
+        items: cart.map(item => {
+            const product = products.find(candidate => candidate.id === item.id);
+            return {
+                productId: item.id,
+                name: product.name,
+                quantity: item.quantity,
+                unitPrice: product.price
+            };
+        }),
+        total: getCartSubtotal()
+    };
+
+    if (!saveOrder(order)) {
+        return;
+    }
+
+    cart = [];
+    saveCart();
+    renderCart();
+    event.currentTarget.reset();
+    document.getElementById('order-dialog').close();
+    showNotification(`Order ${order.orderNumber} saved in this browser. Contact Paapu Masala to arrange delivery.`);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     applyTheme(getStoredTheme());
     renderProducts();
@@ -459,25 +555,18 @@ document.addEventListener('DOMContentLoaded', () => {
         renderProducts();
     });
 
-    document.querySelectorAll('.filter-chip').forEach(button => {
-        button.addEventListener('click', () => {
-            activeCategory = button.dataset.category;
-            document.querySelectorAll('.filter-chip').forEach(chip => {
-                const isSelected = chip === button;
-                chip.classList.toggle('active', isSelected);
-                chip.setAttribute('aria-pressed', String(isSelected));
-            });
-            renderProducts();
-        });
-    });
-
-    document.getElementById('sort-select').addEventListener('change', event => {
-        sortOrder = event.target.value;
-        renderProducts();
-    });
+    document.getElementById('sort-select').addEventListener('change', renderProducts);
+    document.getElementById('toggle-product-form').addEventListener('click', openProductForm);
+    document.getElementById('cancel-product-form').addEventListener('click', closeProductForm);
+    document.getElementById('product-form').addEventListener('submit', addProduct);
 
     document.getElementById('product-grid').addEventListener('click', event => {
         const button = event.target.closest('.add-to-cart-btn');
+        const removeButton = event.target.closest('.remove-product-btn');
+        if (removeButton) {
+            removeProduct(Number(removeButton.dataset.productId));
+            return;
+        }
         if (!button) {
             return;
         }
@@ -511,6 +600,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.getElementById('checkout-button').addEventListener('click', () => {
-        showNotification('Checkout is a demo and is not connected to payment processing.');
+        document.getElementById('dialog-order-total').textContent = formatPrice(getCartSubtotal());
+        document.getElementById('order-dialog').showModal();
     });
+
+    document.getElementById('close-order-dialog').addEventListener('click', () => {
+        document.getElementById('order-dialog').close();
+    });
+    document.getElementById('order-form').addEventListener('submit', placeOrder);
 });
